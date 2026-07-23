@@ -6,11 +6,14 @@ import { deriveUiState } from './state.ts'
 import { StatusBadge } from './components/StatusBadge.tsx'
 import { ToggleButton } from './components/ToggleButton.tsx'
 import { SecretGate } from './components/SecretGate.tsx'
+import { ThemeToggle } from './components/ThemeToggle.tsx'
+import { useTheme } from './useTheme.ts'
 
 const SECRET_KEY = 'pylote.secret'
 const SERVER_NAME = 'Enshrouded'
 
 export function App() {
+  const { theme, toggle: toggleTheme } = useTheme()
   const [secret, setSecret] = useState<string>(
     () => localStorage.getItem(SECRET_KEY) ?? '',
   )
@@ -20,8 +23,16 @@ export function App() {
     setSecret(s)
   }, [])
 
-  if (!secret) return <SecretGate onSubmit={saveSecret} />
-  return <Dashboard secret={secret} onLogout={() => saveSecret('')} />
+  return (
+    <>
+      <ThemeToggle theme={theme} onToggle={toggleTheme} />
+      {secret ? (
+        <Dashboard secret={secret} onLogout={() => saveSecret('')} />
+      ) : (
+        <SecretGate onSubmit={saveSecret} />
+      )}
+    </>
+  )
 }
 
 function Dashboard({ secret, onLogout }: { secret: string; onLogout: () => void }) {
