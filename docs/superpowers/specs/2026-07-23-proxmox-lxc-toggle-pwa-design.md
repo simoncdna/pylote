@@ -88,6 +88,27 @@ Rôle : une page unique pour voir l'état et toggler.
   shell offline (l'app se charge hors-ligne mais indiquera l'erreur réseau si le
   backend est injoignable).
 
+#### Design visuel (validé)
+
+Direction retenue : **« gaming / néon »**.
+
+- **Thème principal : dark** (fond `#0d1117`, texte clair), avec un **light mode**
+  disponible (fond clair `#f4f6f9`) — on suit `prefers-color-scheme`.
+- **Accent** : vert néon (`#3fe78c` en dark, `#12b364` en light) pour l'état actif.
+- **Layout** (une seule page, centré verticalement) : en haut le titre `Pylote` +
+  sous-titre `Server control` ; au centre le badge d'état, le gros **bouton
+  toggle rond** (~112 px), et le nom du serveur (`Enshrouded`) dessous.
+- **Pas de texte d'aide** sous le bouton (l'état ON/OFF se suffit).
+- **Tous les libellés d'interface sont en anglais.**
+- **États visuels** (4) :
+  - **ON** — badge vert `Online` (point lumineux), bouton néon vert « ON ».
+  - **OFF** — badge gris `Offline`, bouton terne/éteint « OFF ».
+  - **Transition** — badge jaune `Starting…` / `Stopping…` (point clignotant) ;
+    le bouton émet un **anneau qui s'écarte** (façon radar/ping) et affiche **trois
+    points qui rebondissent** en son centre ; bouton **non-cliquable** pendant la
+    transition.
+  - **Erreur** — badge rouge `Error` + message court `Proxmox unreachable`.
+
 ## Flux de données
 
 1. La PWA lit le secret depuis `localStorage`.
