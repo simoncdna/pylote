@@ -1,28 +1,14 @@
 import type { ServerState, StatusResponse } from '../shared/types.ts'
 
-export class UnauthorizedError extends Error {
-  constructor() {
-    super('unauthorized')
-    this.name = 'UnauthorizedError'
-  }
-}
-
 export interface ApiClient {
   getStatus(): Promise<ServerState>
   start(): Promise<void>
   stop(): Promise<void>
 }
 
-export function createApiClient(
-  getSecret: () => string,
-  fetchFn: typeof fetch = fetch,
-): ApiClient {
+export function createApiClient(fetchFn: typeof fetch = fetch): ApiClient {
   async function req(path: string, method: 'GET' | 'POST'): Promise<unknown> {
-    const res = await fetchFn(path, {
-      method,
-      headers: { 'X-Auth-Token': getSecret() },
-    })
-    if (res.status === 401) throw new UnauthorizedError()
+    const res = await fetchFn(path, { method })
     if (!res.ok) throw new Error(`Request failed: ${res.status}`)
     return res.json()
   }

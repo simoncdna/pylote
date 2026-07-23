@@ -8,7 +8,6 @@ const cfg: Config = {
   tokenSecret: 'secret',
   node: 'pve',
   vmid: '105',
-  authToken: 'x',
   port: 3000,
 }
 

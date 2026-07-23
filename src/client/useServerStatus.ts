@@ -1,7 +1,7 @@
 // src/client/useServerStatus.ts
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ServerState } from '../shared/types.ts'
-import { UnauthorizedError, type ApiClient } from './api.ts'
+import type { ApiClient } from './api.ts'
 
 const POLL_MS = 5000
 
@@ -9,7 +9,6 @@ export interface ServerStatus {
   state: ServerState
   busy: boolean
   error: boolean
-  unauthorized: boolean
   toggle: () => void
 }
 
@@ -17,7 +16,6 @@ export function useServerStatus(api: ApiClient): ServerStatus {
   const [state, setState] = useState<ServerState>('unknown')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(false)
-  const [unauthorized, setUnauthorized] = useState(false)
   const busyRef = useRef(busy)
   busyRef.current = busy
 
@@ -26,10 +24,8 @@ export function useServerStatus(api: ApiClient): ServerStatus {
     try {
       setState(await api.getStatus())
       setError(false)
-      setUnauthorized(false)
-    } catch (e) {
-      if (e instanceof UnauthorizedError) setUnauthorized(true)
-      else setError(true)
+    } catch {
+      setError(true)
     }
   }, [api])
 
@@ -46,14 +42,13 @@ export function useServerStatus(api: ApiClient): ServerStatus {
     try {
       if (state === 'running') await api.stop()
       else await api.start()
-    } catch (e) {
-      if (e instanceof UnauthorizedError) setUnauthorized(true)
-      else setError(true)
+    } catch {
+      setError(true)
     } finally {
       setBusy(false)
       refresh()
     }
   }, [api, state, refresh])
 
-  return { state, busy, error, unauthorized, toggle }
+  return { state, busy, error, toggle }
 }

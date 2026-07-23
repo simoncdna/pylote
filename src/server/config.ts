@@ -4,7 +4,6 @@ export interface Config {
   tokenSecret: string
   node: string
   vmid: string
-  authToken: string
   port: number
 }
 
@@ -17,7 +16,6 @@ export function loadConfig(env: Env): Config {
     PROXMOX_TOKEN_SECRET: env.PROXMOX_TOKEN_SECRET,
     PROXMOX_NODE: env.PROXMOX_NODE,
     LXC_VMID: env.LXC_VMID,
-    AUTH_TOKEN: env.AUTH_TOKEN,
   }
 
   const missing = Object.entries(required)
@@ -33,7 +31,6 @@ export function loadConfig(env: Env): Config {
     tokenSecret: required.PROXMOX_TOKEN_SECRET!,
     node: required.PROXMOX_NODE!,
     vmid: required.LXC_VMID!,
-    authToken: required.AUTH_TOKEN!,
     port: env.PORT ? Number(env.PORT) : 3000,
   }
 }
