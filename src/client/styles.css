@@ -103,14 +103,15 @@ body {
 /* Toggle button */
 .toggle-wrap { position: relative; display: flex; align-items: center; justify-content: center; width: 128px; height: 128px; }
 .toggle {
+  position: relative; z-index: 2;
   width: 128px; height: 128px; border-radius: 50%;
   font-weight: 800; font-size: 18px; letter-spacing: 1px;
   cursor: pointer; border: 2px solid var(--off-border);
   background: var(--surface); color: var(--off);
   display: flex; align-items: center; justify-content: center;
-  transition: transform .12s ease;
+  transition: transform .12s cubic-bezier(.2,0,0,1);
 }
-.toggle:active { transform: scale(0.96); }
+.toggle:active { transform: scale(0.92); }
 .toggle:disabled { cursor: default; }
 .toggle-on {
   background: var(--toggle-on-bg);
@@ -120,6 +121,36 @@ body {
 .toggle-off { background: var(--surface); color: var(--off); }
 .toggle-pending { color: var(--pending); border-color: rgba(250,204,21,.55); }
 .toggle-error { color: var(--error); border-color: rgba(248,113,113,.5); font-size: 34px; }
+
+/* Breathing aura — ON only, sits behind the button */
+.toggle-aura {
+  position: absolute; z-index: 0; width: 128px; height: 128px; border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(63,231,140,.5), transparent 68%);
+  filter: blur(12px);
+  animation: aura-breathe 3.4s ease-in-out infinite;
+}
+@keyframes aura-breathe {
+  0%, 100% { transform: scale(1); opacity: .4; }
+  50%      { transform: scale(1.16); opacity: .72; }
+}
+
+/* Land feedback: expanding ripple + brief brightness flash when a transition ends */
+.toggle-ripple {
+  position: absolute; z-index: 1; width: 128px; height: 128px; border-radius: 50%;
+  pointer-events: none; border: 2px solid var(--off);
+  animation: toggle-ripple .6s cubic-bezier(.2,0,0,1) forwards;
+}
+.toggle-ripple.ripple-on { border-color: var(--accent); }
+@keyframes toggle-ripple {
+  0%   { transform: scale(.72); opacity: .7; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+.toggle-land { animation: toggle-flash .34s ease-out; }
+@keyframes toggle-flash {
+  0%   { filter: brightness(1.7); }
+  100% { filter: brightness(1); }
+}
 
 /* Ring pulse (transition) */
 .ring {
@@ -155,3 +186,14 @@ body {
 }
 .theme-toggle:hover { border-color: var(--accent); }
 .theme-toggle:active { transform: scale(0.92); }
+
+/* Accessibility: honour reduced-motion — drop ambient/looping motion, keep
+   state changes near-instant. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .toggle-aura { opacity: 0.5; }
+}
