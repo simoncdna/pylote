@@ -2,52 +2,58 @@
 /* Dark is the default; an explicit `data-theme` on <html> wins over the OS. */
 :root,
 :root[data-theme='dark'] {
-  --bg: #0d1117;
+  --bg: #0a0e16;
   --fg: #e6edf3;
   --sub: rgba(230, 237, 243, 0.55);
   --card-border: #1f2733;
-  --accent: #3fe78c;
-  --accent-dim: #0d3a26;
+  --accent: #5db6ff;
+  --accent-rgb: 93, 182, 255;
+  --ember-hot: #d6ecff;
+  --accent-dim: #0b2a4a;
   --off: #5b6675;
   --off-border: #2a333f;
   --pending: #fbbf24;
   --error: #f87171;
   --surface: #161b22;
   --input-bg: #161b22;
-  --toggle-on-bg: radial-gradient(circle at 30% 28%, #1b6b45, var(--accent-dim));
+  --toggle-on-bg: radial-gradient(circle at 30% 28%, #1c5c9e, var(--accent-dim));
   --toggle-on-fg: var(--accent);
 }
 
 /* Light palette. Applied on an explicit choice... */
 :root[data-theme='light'] {
-  --bg: #f4f6f9;
+  --bg: #eef3f9;
   --fg: #101826;
   --sub: rgba(16, 24, 38, 0.55);
   --card-border: #e2e6ec;
-  --accent: #12b364;
-  --accent-dim: #daf6e6;
+  --accent: #2b8fe0;
+  --accent-rgb: 43, 143, 224;
+  --ember-hot: #eaf5ff;
+  --accent-dim: #d8ecff;
   --off: #98a2b3;
   --off-border: #d3d8e0;
   --surface: #e7eaef;
   --input-bg: #ffffff;
-  --toggle-on-bg: radial-gradient(circle at 30% 28%, #2fe084, var(--accent));
-  --toggle-on-fg: #053b22;
+  --toggle-on-bg: radial-gradient(circle at 30% 28%, #4fb0ff, var(--accent));
+  --toggle-on-fg: #04294a;
 }
 /* ...and as the OS default when the user has made no explicit choice. */
 @media (prefers-color-scheme: light) {
   :root:not([data-theme]) {
-    --bg: #f4f6f9;
+    --bg: #eef3f9;
     --fg: #101826;
     --sub: rgba(16, 24, 38, 0.55);
     --card-border: #e2e6ec;
-    --accent: #12b364;
-    --accent-dim: #daf6e6;
+    --accent: #2b8fe0;
+    --accent-rgb: 43, 143, 224;
+    --ember-hot: #eaf5ff;
+    --accent-dim: #d8ecff;
     --off: #98a2b3;
     --off-border: #d3d8e0;
     --surface: #e7eaef;
     --input-bg: #ffffff;
-    --toggle-on-bg: radial-gradient(circle at 30% 28%, #2fe084, var(--accent));
-    --toggle-on-fg: #053b22;
+    --toggle-on-bg: radial-gradient(circle at 30% 28%, #4fb0ff, var(--accent));
+    --toggle-on-fg: #04294a;
   }
 }
 
@@ -60,11 +66,132 @@ body {
 }
 
 .screen {
+  position: relative;
+  z-index: 1;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: env(safe-area-inset-top) 20px 24px;
+}
+
+/* ── Enshrouded ambiance: blue embers drifting up from the base ──────────── */
+.embers {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+/* The field holds everything that can be "blown out": fog, base glow, embers. */
+.ember-field {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 50%;
+  transition: transform 0.8s cubic-bezier(0.16, 0.7, 0.2, 1), opacity 0.7s ease;
+}
+/* Server OFF → the shockwave has snuffed the fire: the whole field is pushed
+   outward from centre and vanishes. Reversing (OFF → ON) whooshes it back in. */
+.blown {
+  transform: scale(1.85);
+  opacity: 0;
+}
+.blown .ember,
+.blown .ember-base,
+.blown .fog {
+  animation-play-state: paused;
+}
+
+/* One-shot halo that rings out from the button when the server is turned off,
+   pushing the embers and Shroud away ahead of it. */
+.shockwave {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 132px;
+  height: 132px;
+  margin: -66px 0 0 -66px;
+  border-radius: 50%;
+  border: 2px solid rgba(var(--accent-rgb), 0.85);
+  box-shadow: 0 0 34px rgba(var(--accent-rgb), 0.55),
+    inset 0 0 24px rgba(var(--accent-rgb), 0.4);
+  pointer-events: none;
+  animation: shockwave-out 0.8s cubic-bezier(0.16, 0.7, 0.2, 1) forwards;
+}
+@keyframes shockwave-out {
+  0%   { transform: scale(0.55); opacity: 0; }
+  12%  { opacity: 0.85; }
+  100% { transform: scale(9);    opacity: 0; }
+}
+/* Brume: a slow bluish haze rolling at the base, the Shroud the embers rise
+   through. Two offset gradient bands drift in opposite phases for depth. */
+.fog {
+  position: absolute;
+  left: -20%;
+  bottom: 0;
+  width: 140%;
+  height: 52vh;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 42% 72% at 22% 100%, rgba(var(--accent-rgb), 0.16), transparent 62%),
+    radial-gradient(ellipse 48% 64% at 54% 100%, rgba(120, 165, 225, 0.13), transparent 64%),
+    radial-gradient(ellipse 38% 74% at 84% 100%, rgba(var(--accent-rgb), 0.14), transparent 62%);
+  filter: blur(28px);
+  animation: fog-drift 24s ease-in-out infinite alternate;
+}
+@keyframes fog-drift {
+  0%   { transform: translateX(-4%) scaleY(1);    opacity: 0.75; }
+  100% { transform: translateX(4%)  scaleY(1.14); opacity: 1; }
+}
+
+/* The fire off-screen below: a soft blue glow the embers rise out of. */
+.ember-base {
+  position: absolute;
+  left: 50%;
+  bottom: -22vh;
+  width: 150vw;
+  height: 46vh;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    ellipse 50% 60% at 50% 100%,
+    rgba(var(--accent-rgb), 0.32),
+    rgba(var(--accent-rgb), 0.10) 42%,
+    transparent 70%
+  );
+  filter: blur(8px);
+  animation: ember-base-flicker 4.5s ease-in-out infinite;
+}
+@keyframes ember-base-flicker {
+  0%, 100% { opacity: 0.75; transform: translateX(-50%) scaleY(1); }
+  50%      { opacity: 1;    transform: translateX(-50%) scaleY(1.08); }
+}
+
+.ember {
+  position: absolute;
+  bottom: -12px;
+  left: var(--x);
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    var(--ember-hot),
+    var(--accent) 42%,
+    transparent 72%
+  );
+  box-shadow: 0 0 var(--glow) rgba(var(--accent-rgb), 0.8);
+  opacity: 0;
+  will-change: transform, opacity;
+  /* linear = constant speed, so the ember never hovers at spawn then jumps. */
+  animation: ember-rise var(--dur) linear var(--delay) infinite;
+}
+/* Monotonic climb: Y only ever rises, X drifts one way, scale eases down and
+   the ember burns out at the top. Fade-in happens fast while already moving. */
+@keyframes ember-rise {
+  0%   { transform: translate(0, 0) scale(var(--s)); opacity: 0; }
+  6%   { opacity: var(--o); }
+  88%  { opacity: var(--o); }
+  100% { transform: translate(var(--dx), -104vh) scale(0.12); opacity: 0; }
 }
 .header { margin-top: 28px; text-align: center; }
 .brand { font-size: 28px; font-weight: 800; letter-spacing: 0.5px; margin: 0; }
@@ -91,8 +218,13 @@ body {
   border: 1px solid transparent;
 }
 .badge-dot { width: 7px; height: 7px; border-radius: 50%; }
-.badge-on { background: rgba(63,231,140,.12); color: var(--accent); border-color: rgba(63,231,140,.35); }
-.badge-on .badge-dot { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+.badge-on { background: rgba(var(--accent-rgb),.12); color: var(--accent); border-color: rgba(var(--accent-rgb),.35); }
+.badge-on .badge-dot { background: var(--accent); animation: dot-pulse 1.8s ease-in-out infinite; }
+/* Alive heartbeat while ON — a soft glow that breathes rather than blinks. */
+@keyframes dot-pulse {
+  0%, 100% { box-shadow: 0 0 2px rgba(var(--accent-rgb),.45); opacity: .82; }
+  50%      { box-shadow: 0 0 5px rgba(var(--accent-rgb),.7);  opacity: 1; }
+}
 .badge-off { background: rgba(148,163,184,.12); color: var(--off); border-color: rgba(148,163,184,.3); }
 .badge-off .badge-dot { background: var(--off); }
 .badge-pending { background: rgba(250,204,21,.12); color: var(--pending); border-color: rgba(250,204,21,.35); }
@@ -116,7 +248,7 @@ body {
 .toggle-on {
   background: var(--toggle-on-bg);
   color: var(--toggle-on-fg); border-color: var(--accent);
-  box-shadow: 0 0 28px rgba(63,231,140,.5), inset 0 0 18px rgba(63,231,140,.25);
+  box-shadow: 0 0 28px rgba(var(--accent-rgb),.5), inset 0 0 18px rgba(var(--accent-rgb),.28);
 }
 .toggle-off { background: var(--surface); color: var(--off); }
 .toggle-pending { color: var(--pending); border-color: rgba(250,204,21,.55); }
@@ -126,7 +258,7 @@ body {
 .toggle-aura {
   position: absolute; z-index: 0; width: 128px; height: 128px; border-radius: 50%;
   pointer-events: none;
-  background: radial-gradient(circle, rgba(63,231,140,.5), transparent 68%);
+  background: radial-gradient(circle, rgba(var(--accent-rgb),.5), transparent 68%);
   filter: blur(12px);
   animation: aura-breathe 3.4s ease-in-out infinite;
 }
@@ -217,4 +349,10 @@ body {
     transition-duration: 0.01ms !important;
   }
   .toggle-aura { opacity: 0.5; }
+  /* Drop the moving embers, keep the static base glow + fog for atmosphere. */
+  .ember { display: none; }
+  .ember-base { animation: none; opacity: 0.8; }
+  .fog { animation: none; opacity: 0.85; }
+  .ember-field { transition: none; }
+  .shockwave { display: none; }
 }

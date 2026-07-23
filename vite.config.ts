@@ -24,8 +24,8 @@ export default defineConfig({
         name: 'Pylote',
         short_name: 'Pylote',
         description: 'Server control',
-        theme_color: '#0d1117',
-        background_color: '#0d1117',
+        theme_color: '#0a0e16',
+        background_color: '#0a0e16',
         display: 'standalone',
         icons: [
           {

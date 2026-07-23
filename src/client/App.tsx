@@ -6,6 +6,7 @@ import { deriveUiState } from './state.ts'
 import { StatusBadge } from './components/StatusBadge.tsx'
 import { ToggleButton } from './components/ToggleButton.tsx'
 import { ThemeToggle } from './components/ThemeToggle.tsx'
+import { Embers } from './components/Embers.tsx'
 import { useTheme } from './useTheme.ts'
 
 const SERVER_NAME = 'Enshrouded'
@@ -28,6 +29,7 @@ function Dashboard() {
 
   return (
     <main className="screen">
+      <Embers active={ui === 'on'} />
       <header className="header">
         <h1 className="brand">Pylote</h1>
         <p className="sub">Server control</p>
