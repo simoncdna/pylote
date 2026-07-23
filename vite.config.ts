@@ -9,9 +9,11 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
-    // In dev, forward API calls to the Bun server.
+    // In dev, forward API calls to the Bun server. The key is a regex (leading
+    // `^`) matching only `/api/...` routes — NOT a plain `/api` prefix, which
+    // would also capture the `/api.ts` source module and break its load.
     proxy: {
-      '/api': 'http://localhost:3000',
+      '^/api/': 'http://localhost:3000',
     },
   },
   plugins: [
