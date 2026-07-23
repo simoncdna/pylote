@@ -23,7 +23,7 @@ export function App() {
 
 function Dashboard() {
   const api = useMemo(() => createApiClient(), [])
-  const { state, busy, error, toggle } = useServerStatus(api)
+  const { state, busy, error, pendingAction, toggle } = useServerStatus(api)
   const ui = deriveUiState({ state, busy, error })
 
   return (
@@ -33,7 +33,7 @@ function Dashboard() {
         <p className="sub">Server control</p>
       </header>
       <section className="center">
-        <StatusBadge ui={ui} />
+        <StatusBadge ui={ui} pendingAction={pendingAction} />
         <ToggleButton ui={ui} onToggle={toggle} />
         <span className="name">{SERVER_NAME}</span>
         {/* Always rendered so its reserved height keeps the block from shifting
