@@ -79,7 +79,9 @@ body {
   gap: 26px;
 }
 .name { font-size: 14px; color: var(--sub); }
-.err-msg { font-size: 13px; color: var(--error); }
+/* min-height reserves the line so the centered block doesn't jump when the
+   error message shows/hides between states. */
+.err-msg { font-size: 13px; color: var(--error); min-height: 1.2em; }
 
 /* Badge */
 .badge {
