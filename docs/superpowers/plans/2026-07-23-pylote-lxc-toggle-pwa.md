@@ -91,6 +91,7 @@ pylote/
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.0",
+    "bun-types": "^1.1.0",
     "concurrently": "^9.0.0",
     "typescript": "^5.6.0",
     "vite": "^5.4.0",
@@ -1448,7 +1449,7 @@ git commit -m "chore: verify build and full test suite" || echo "nothing to comm
 ```dockerfile
 FROM oven/bun:1 AS build
 WORKDIR /app
-COPY package.json bun.lockb ./
+COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 COPY . .
 RUN bun run build
