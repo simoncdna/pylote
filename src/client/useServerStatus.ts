@@ -16,10 +16,15 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+/** Which direction a toggle is heading while `busy`. */
+export type PendingAction = 'start' | 'stop'
+
 export interface ServerStatus {
   state: ServerState
   busy: boolean
   error: boolean
+  /** Set while a toggle is in flight, so the UI can say "Starting…"/"Stopping…". */
+  pendingAction: PendingAction | null
   toggle: () => void
 }
 
@@ -27,6 +32,7 @@ export function useServerStatus(api: ApiClient): ServerStatus {
   const [state, setState] = useState<ServerState>('unknown')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(false)
+  const [pendingAction, setPendingAction] = useState<PendingAction | null>(null)
   const busyRef = useRef(busy)
   busyRef.current = busy
 
@@ -48,11 +54,13 @@ export function useServerStatus(api: ApiClient): ServerStatus {
 
   const toggle = useCallback(async () => {
     if (busyRef.current) return
-    const target: ServerState = state === 'running' ? 'stopped' : 'running'
+    const action: PendingAction = state === 'running' ? 'stop' : 'start'
+    const target: ServerState = action === 'stop' ? 'stopped' : 'running'
     setBusy(true)
+    setPendingAction(action)
     setError(false)
     try {
-      if (state === 'running') await api.stop()
+      if (action === 'stop') await api.stop()
       else await api.start()
 
       // Wait for the LXC to actually reach the target state.
@@ -72,9 +80,10 @@ export function useServerStatus(api: ApiClient): ServerStatus {
       setError(true)
     } finally {
       setBusy(false)
+      setPendingAction(null)
       refresh()
     }
   }, [api, state, refresh])
 
-  return { state, busy, error, toggle }
+  return { state, busy, error, pendingAction, toggle }
 }

@@ -1,5 +1,6 @@
 // src/client/components/StatusBadge.tsx
 import type { UiState } from '../state.ts'
+import type { PendingAction } from '../useServerStatus.ts'
 
 const LABEL: Record<UiState, string> = {
   on: 'Online',
@@ -8,11 +9,23 @@ const LABEL: Record<UiState, string> = {
   error: 'Error',
 }
 
-export function StatusBadge({ ui }: { ui: UiState }) {
+export function StatusBadge({
+  ui,
+  pendingAction,
+}: {
+  ui: UiState
+  pendingAction?: PendingAction | null
+}) {
+  const label =
+    ui === 'pending' && pendingAction
+      ? pendingAction === 'stop'
+        ? 'Stopping…'
+        : 'Starting…'
+      : LABEL[ui]
   return (
     <span className={`badge badge-${ui}`}>
       <span className="badge-dot" />
-      {LABEL[ui]}
+      {label}
     </span>
   )
 }
