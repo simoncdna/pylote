@@ -187,6 +187,27 @@ body {
 .theme-toggle:hover { border-color: var(--accent); }
 .theme-toggle:active { transform: scale(0.92); }
 
+/* Theme change = smooth crossfade (View Transitions API default), just retimed. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 260ms;
+  animation-timing-function: ease;
+}
+
+/* App entrance choreography — plays once on load. */
+@keyframes enter-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes enter-fade { from { opacity: 0; } to { opacity: 1; } }
+.header { animation: enter-rise .5s .04s ease-out both; }
+.center > * { animation: enter-rise .5s ease-out both; }
+.center > *:nth-child(1) { animation-delay: .14s; }
+.center > *:nth-child(2) { animation-delay: .22s; }
+.center > *:nth-child(3) { animation-delay: .30s; }
+.center > *:nth-child(4) { animation-delay: .30s; }
+.theme-toggle { animation: enter-fade .5s .34s ease-out both; }
+
 /* Accessibility: honour reduced-motion — drop ambient/looping motion, keep
    state changes near-instant. */
 @media (prefers-reduced-motion: reduce) {
