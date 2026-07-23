@@ -382,7 +382,7 @@ export function createProxmoxClient(
     const res = await fetchFn(`${base}${path}`, {
       method,
       headers,
-      // @ts-expect-error Bun-specific fetch option for self-signed certs
+      // Bun-specific fetch option for self-signed certs (typed via bun-types).
       tls,
     })
     if (!res.ok) {
