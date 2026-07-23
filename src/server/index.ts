@@ -6,7 +6,7 @@ import { createApp } from './app.ts'
 
 const config = loadConfig(process.env)
 const proxmox = createProxmoxClient(config)
-const app = createApp({ proxmox, authToken: config.authToken })
+const app = createApp({ proxmox })
 
 // Serve the built PWA. API routes are already registered (they win over static).
 const CLIENT_DIR = './dist/client'

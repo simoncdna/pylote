@@ -41,5 +41,5 @@ docker build -t pylote .
 docker run -d --env-file .env -p 3000:3000 --restart unless-stopped pylote
 ```
 
-Then open `http://<app-lxc-ip>:3000` on your phone (over the VPN), enter the
-access token, and install it as a PWA.
+Then open `http://<app-lxc-ip>:3000` on your phone (over the VPN) and install
+it as a PWA.

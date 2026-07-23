@@ -7,7 +7,6 @@ const full = {
   PROXMOX_TOKEN_SECRET: 'secret-uuid',
   PROXMOX_NODE: 'pve',
   LXC_VMID: '105',
-  AUTH_TOKEN: 'shhh',
   PORT: '3000',
 }
 
