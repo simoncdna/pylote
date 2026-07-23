@@ -56,7 +56,9 @@ function Dashboard({ secret, onLogout }: { secret: string; onLogout: () => void 
         <StatusBadge ui={ui} />
         <ToggleButton ui={ui} onToggle={toggle} />
         <span className="name">{SERVER_NAME}</span>
-        {ui === 'error' && <span className="err-msg">Proxmox unreachable</span>}
+        {/* Always rendered so its reserved height keeps the block from shifting
+            when the error line appears/disappears. */}
+        <span className="err-msg">{ui === 'error' ? 'Proxmox unreachable' : ''}</span>
       </section>
     </main>
   )
