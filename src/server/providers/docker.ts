@@ -47,7 +47,9 @@ export function createDockerProvider(
       await call(`/containers/${name}/start`, 'POST')
     },
     async stop() {
-      await call(`/containers/${name}/stop`, 'POST')
+      // t=60: give game servers time to save before Docker escalates to SIGKILL
+      // (the engine default is only 10s).
+      await call(`/containers/${name}/stop?t=60`, 'POST')
     },
   }
 }

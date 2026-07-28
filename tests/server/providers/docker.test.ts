@@ -50,7 +50,7 @@ test('start/stop POST to the engine endpoints', async () => {
 
   const b = fakeFetch(204, '')
   await createDockerProvider(unixOpts, b.fn).stop()
-  expect(b.calls[0].url).toBe('http://localhost/containers/valheim-server/stop')
+  expect(b.calls[0].url).toBe('http://localhost/containers/valheim-server/stop?t=60')
 })
 
 test('304 (already in requested state) is success', async () => {
