@@ -356,3 +356,50 @@ body {
   .ember-field { transition: none; }
   .shockwave { display: none; }
 }
+
+/* ---- multi-server cards ---- */
+.cards {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+  width: min(720px, 100%);
+  margin: 0 auto;
+  padding: 8px 20px 40px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 12px 8px;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+}
+
+.card-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.card-name {
+  font-weight: 600;
+}
+
+.card-game {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  text-transform: capitalize;
+}
+
+/* Shrink the living power button to card scale. */
+.card-toggle {
+  transform: scale(0.68);
+  transform-origin: center;
+  margin: -14px 0;
+}

@@ -1,6 +1,6 @@
 // src/client/components/StatusBadge.tsx
 import type { UiState } from '../state.ts'
-import type { PendingAction } from '../useServerStatus.ts'
+import type { PendingAction } from '../useServers.ts'
 
 const LABEL: Record<UiState, string> = {
   on: 'Online',
