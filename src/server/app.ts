@@ -1,5 +1,4 @@
-import { Hono } from 'hono'
-import type { Context } from 'hono'
+import { Hono, type Context } from 'hono'
 import type { Registry } from './registry.ts'
 import type {
   ServerSummary,
@@ -23,8 +22,9 @@ export function createApp({ registry }: AppDeps): Hono {
         let state: ServerState = 'unknown'
         try {
           state = await provider.status()
-        } catch {
+        } catch (e) {
           // Unreachable backend → unknown for this card, never a global 500.
+          console.warn(`${meta.name}: status check failed — ${e}`)
         }
         return { ...meta, state }
       }),
@@ -41,7 +41,8 @@ export function createApp({ registry }: AppDeps): Hono {
       try {
         await entry.provider[kind]()
         return c.json<ActionResponse>({ ok: true })
-      } catch {
+      } catch (e) {
+        console.warn(`${entry.meta.name}: ${kind} failed — ${e}`)
         return c.json<ErrorResponse>(
           { error: `${entry.meta.name}: backend unreachable` },
           502,
