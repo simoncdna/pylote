@@ -60,8 +60,11 @@ test('buildRegistry keys entries by id with meta (no secrets)', () => {
 
 test('proxmox-vm entries talk to the qemu API path', async () => {
   const { fn, calls } = fakeFetch()
-  await buildRegistry(config, fn).get('win')!.provider.status()
+  const reg = buildRegistry(config, fn)
+  await reg.get('win')!.provider.status()
   expect(calls[0]).toContain('/qemu/200/')
+  await reg.get('enshrouded')!.provider.status()
+  expect(calls[1]).toContain('/lxc/103/')
 })
 
 test('docker entries talk to the Docker engine', async () => {
