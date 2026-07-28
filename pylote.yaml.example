@@ -1,0 +1,34 @@
+# Pylote configuration — every server you want on the dashboard.
+# ${VARS} are read from the environment (put secrets in .env).
+
+port: 3000
+
+servers:
+  # A Proxmox LXC container
+  - id: enshrouded
+    name: Enshrouded
+    game: enshrouded          # optional — colors the card
+    type: proxmox-lxc
+    url: https://proxmox.local:8006
+    tokenId: ${PROXMOX_TOKEN_ID}
+    tokenSecret: ${PROXMOX_TOKEN_SECRET}
+    node: pve
+    vmid: 105
+
+  # A Proxmox virtual machine
+  # - id: windows
+  #   name: Windows VM
+  #   type: proxmox-vm
+  #   url: https://proxmox.local:8006
+  #   tokenId: ${PROXMOX_TOKEN_ID}
+  #   tokenSecret: ${PROXMOX_TOKEN_SECRET}
+  #   node: pve
+  #   vmid: 200
+
+  # A Docker container — local socket or remote host
+  # - id: valheim
+  #   name: Valheim
+  #   game: valheim
+  #   type: docker
+  #   host: unix:///var/run/docker.sock   # or tcp://my-vps:2375
+  #   container: valheim-server

@@ -1,23 +1,40 @@
 # Pylote
 
-A small PWA to turn the Enshrouded Proxmox LXC on/off from your phone.
+A small PWA to turn your game servers on/off from your phone — Proxmox
+LXCs/VMs and Docker containers.
 
 Monolith: Bun + Hono serves the React/Vite PWA and a tiny API that calls the
-Proxmox REST API. Runs in the always-on `app` LXC; controls a *different* LXC.
+Proxmox REST API. Runs in the always-on `app` LXC; controls other
+LXCs/VMs/containers.
 
 ## Configure
 
-Copy `.env.example` to `.env` and fill in the values.
+Copy `pylote.yaml.example` to `pylote.yaml` and declare your servers — any mix
+of Proxmox LXC containers (`proxmox-lxc`), Proxmox VMs (`proxmox-vm`) and
+Docker containers (`docker`). Secrets stay out of the yaml: write `${MY_VAR}`
+and provide it via the environment (`.env`, `--env-file`, …).
 
-### Create a Proxmox API token
+`PYLOTE_CONFIG` overrides the config path (default `./pylote.yaml`).
+
+### Proxmox backends (`proxmox-lxc`, `proxmox-vm`)
+
+Fields: `url`, `tokenId`, `tokenSecret`, `node`, `vmid`.
+
+Create the API token:
 1. Proxmox UI → **Datacenter → Permissions → API Tokens → Add**.
    Pick a user (e.g. `pylote@pve`) and a token name (e.g. `toggle`).
    Copy the **Token ID** (`pylote@pve!toggle`) and the **Secret** (shown once).
 2. Give the token power rights: **Datacenter → Permissions → Add → API Token
    Permission**. Path `/vms/<VMID>` (or a pool), role with `VM.PowerMgmt` +
    `VM.Audit`.
-3. Find the **VMID** and **node name**: shown next to the LXC in the Proxmox tree
-   (e.g. VMID `105`, node `pve`).
+3. The **VMID** and **node name** are shown next to the guest in the Proxmox
+   tree (e.g. VMID `105`, node `pve`).
+
+### Docker backend (`docker`)
+
+Fields: `host` (`unix:///var/run/docker.sock` or `tcp://host:2375`) and
+`container` (name or id). When Pylote runs in Docker itself, mount the socket:
+`-v /var/run/docker.sock:/var/run/docker.sock`.
 
 ## Develop
 
@@ -31,14 +48,16 @@ bun test             # run tests
 
 ```bash
 bun run build        # builds dist/client
-bun run start        # serves PWA + API on $PORT
+bun run start        # serves PWA + API on the configured port
 ```
 
 Or with Docker:
 
 ```bash
 docker build -t pylote .
-docker run -d --env-file .env -p 3000:3000 --restart unless-stopped pylote
+docker run -d --env-file .env \
+  -v $(pwd)/pylote.yaml:/app/pylote.yaml:ro \
+  -p 3000:3000 --restart unless-stopped pylote
 ```
 
 Then open `http://<app-lxc-ip>:3000` on your phone (over the VPN) and install
