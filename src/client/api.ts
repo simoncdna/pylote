@@ -1,9 +1,9 @@
-import type { ServerState, StatusResponse } from '../shared/types.ts'
+import type { ServerSummary } from '../shared/types.ts'
 
 export interface ApiClient {
-  getStatus(): Promise<ServerState>
-  start(): Promise<void>
-  stop(): Promise<void>
+  listServers(): Promise<ServerSummary[]>
+  start(id: string): Promise<void>
+  stop(id: string): Promise<void>
 }
 
 export function createApiClient(fetchFn: typeof fetch = fetch): ApiClient {
@@ -14,15 +14,14 @@ export function createApiClient(fetchFn: typeof fetch = fetch): ApiClient {
   }
 
   return {
-    async getStatus() {
-      const body = (await req('/api/status', 'GET')) as StatusResponse
-      return body.state
+    async listServers() {
+      return (await req('/api/servers', 'GET')) as ServerSummary[]
     },
-    async start() {
-      await req('/api/start', 'POST')
+    async start(id: string) {
+      await req(`/api/servers/${encodeURIComponent(id)}/start`, 'POST')
     },
-    async stop() {
-      await req('/api/stop', 'POST')
+    async stop(id: string) {
+      await req(`/api/servers/${encodeURIComponent(id)}/stop`, 'POST')
     },
   }
 }

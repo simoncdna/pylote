@@ -7,34 +7,33 @@ function fakeFetch(status: number, body: unknown) {
     calls.push({ url, init })
     return new Response(JSON.stringify(body), { status })
   }
-  return { fn, calls }
+  return { fn: fn as unknown as typeof fetch, calls }
 }
 
-test('getStatus returns state', async () => {
-  const { fn, calls } = fakeFetch(200, { state: 'running' })
-  const api = createApiClient(fn as unknown as typeof fetch)
-  const state = await api.getStatus()
-  expect(state).toBe('running')
-  expect(calls[0].url).toBe('/api/status')
+test('listServers GETs /api/servers and returns the list', async () => {
+  const servers = [
+    { id: 'a', name: 'A', type: 'proxmox-lxc', state: 'running' },
+  ]
+  const { fn, calls } = fakeFetch(200, servers)
+  const api = createApiClient(fn)
+  expect(await api.listServers()).toEqual(servers)
+  expect(calls[0].url).toBe('/api/servers')
 })
 
-test('start POSTs to /api/start', async () => {
+test('start POSTs to /api/servers/:id/start', async () => {
   const { fn, calls } = fakeFetch(200, { ok: true })
-  const api = createApiClient(fn as unknown as typeof fetch)
-  await api.start()
-  expect(calls[0].url).toBe('/api/start')
+  await createApiClient(fn).start('enshrouded')
+  expect(calls[0].url).toBe('/api/servers/enshrouded/start')
   expect(calls[0].init?.method).toBe('POST')
 })
 
-test('stop POSTs to /api/stop', async () => {
+test('stop POSTs to /api/servers/:id/stop', async () => {
   const { fn, calls } = fakeFetch(200, { ok: true })
-  const api = createApiClient(fn as unknown as typeof fetch)
-  await api.stop()
-  expect(calls[0].url).toBe('/api/stop')
+  await createApiClient(fn).stop('enshrouded')
+  expect(calls[0].url).toBe('/api/servers/enshrouded/stop')
 })
 
-test('502 throws a generic error', async () => {
-  const { fn } = fakeFetch(502, { error: 'Proxmox unreachable' })
-  const api = createApiClient(fn as unknown as typeof fetch)
-  await expect(api.getStatus()).rejects.toThrow()
+test('non-2xx throws', async () => {
+  const { fn } = fakeFetch(502, { error: 'down' })
+  await expect(createApiClient(fn).listServers()).rejects.toThrow()
 })
