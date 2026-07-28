@@ -1533,6 +1533,12 @@ git add src/client tests/client
 git commit -m "feat: card dashboard with per-server pending, single-server layout kept"
 ```
 
+**Deviations (applied after review):**
+- `ServerCard.tsx`/`styles.css` use `--card-accent` instead of `--accent` so the per-card game color no longer hijacks the theme's `--accent`/`--accent-rgb`/`--toggle-on-*` tokens.
+- `ToggleButton` takes a `name` prop for a per-server `aria-label`; `StatusBadge`'s root span got `role="status"` so state changes are announced.
+- `useServers.ts` gained a monotonic `seqRef`/`fetchList` sequence guard so a stale interval response can't clobber a newer transition-poll response (or vice versa).
+- `toggle` in `useServers.ts` now sets that server's error flag if the 120s transition deadline expires without reaching the target state.
+
 ---
 
 ### Task 9: Delete legacy code

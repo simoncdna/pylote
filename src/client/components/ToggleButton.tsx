@@ -5,9 +5,10 @@ import type { UiState } from '../state.ts'
 interface Props {
   ui: UiState
   onToggle: () => void
+  name: string
 }
 
-export function ToggleButton({ ui, onToggle }: Props) {
+export function ToggleButton({ ui, onToggle, name }: Props) {
   const disabled = ui === 'pending'
   const prevUi = useRef(ui)
   const [landing, setLanding] = useState(false)
@@ -39,7 +40,7 @@ export function ToggleButton({ ui, onToggle }: Props) {
         className={`toggle toggle-${ui}${landing ? ' toggle-land' : ''}`}
         onClick={onToggle}
         disabled={disabled}
-        aria-label="Toggle server"
+        aria-label={`Toggle ${name}`}
       >
         {ui === 'on' && 'ON'}
         {ui === 'off' && 'OFF'}

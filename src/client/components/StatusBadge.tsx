@@ -23,7 +23,7 @@ export function StatusBadge({
         : 'Starting…'
       : LABEL[ui]
   return (
-    <span className={`badge badge-${ui}`}>
+    <span className={`badge badge-${ui}`} role="status">
       <span className="badge-dot" />
       {label}
     </span>

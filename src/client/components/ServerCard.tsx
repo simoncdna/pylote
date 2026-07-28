@@ -20,14 +20,14 @@ export function ServerCard({ server }: { server: ServerView }) {
   })
   const accent = GAME_ACCENTS[server.game ?? ''] ?? DEFAULT_ACCENT
   return (
-    <article className="card" style={{ '--accent': accent } as CSSProperties}>
+    <article className="card" style={{ '--card-accent': accent } as CSSProperties}>
       <header className="card-head">
         <span className="card-name">{server.name}</span>
         {server.game && <span className="card-game">{server.game}</span>}
       </header>
       <StatusBadge ui={ui} pendingAction={server.pendingAction} />
       <div className="card-toggle">
-        <ToggleButton ui={ui} onToggle={server.toggle} />
+        <ToggleButton ui={ui} onToggle={server.toggle} name={server.name} />
       </div>
       <span className="err-msg">{ui === 'error' ? 'Backend unreachable' : ''}</span>
     </article>

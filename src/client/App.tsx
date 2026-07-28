@@ -60,7 +60,7 @@ function SingleServer({ server }: { server: ServerView }) {
   return (
     <section className="center">
       <StatusBadge ui={ui} pendingAction={server.pendingAction} />
-      <ToggleButton ui={ui} onToggle={server.toggle} />
+      <ToggleButton ui={ui} onToggle={server.toggle} name={server.name} />
       <span className="name">{server.name}</span>
       {/* Always rendered so its reserved height keeps the block from shifting
           when the error line appears/disappears. */}

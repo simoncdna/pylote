@@ -40,17 +40,28 @@ export function useServers(api: ApiClient): ServersStatus {
   const [errors, setErrors] = useState<Record<string, boolean>>({})
   const pendingRef = useRef(pending)
   pendingRef.current = pending
+  // Guards against the 5s interval refresh and the 2s transition poll racing:
+  // a stale response landing after a newer one has already resolved must not
+  // overwrite `list` with outdated data.
+  const seqRef = useRef(0)
+
+  const fetchList = useCallback(async (): Promise<ServerSummary[]> => {
+    const seq = ++seqRef.current
+    const servers = await api.listServers()
+    if (seq === seqRef.current) setList(servers)
+    return servers
+  }, [api])
 
   const refresh = useCallback(async () => {
     try {
-      setList(await api.listServers())
+      await fetchList()
       setListError(false)
     } catch {
       setListError(true)
     } finally {
       setLoaded(true)
     }
-  }, [api])
+  }, [fetchList])
 
   useEffect(() => {
     refresh()
@@ -69,17 +80,21 @@ export function useServers(api: ApiClient): ServersStatus {
         if (action === 'stop') await api.stop(id)
         else await api.start(id)
 
+        let reached = false
         const deadline = Date.now() + TRANSITION_TIMEOUT_MS
         while (Date.now() < deadline) {
           await sleep(TRANSITION_POLL_MS)
           try {
-            const servers = await api.listServers()
-            setList(servers)
-            if (servers.find((s) => s.id === id)?.state === target) break
+            const servers = await fetchList()
+            if (servers.find((s) => s.id === id)?.state === target) {
+              reached = true
+              break
+            }
           } catch {
             // Transient failure mid-transition: keep waiting.
           }
         }
+        if (!reached) setErrors((e) => ({ ...e, [id]: true }))
       } catch {
         setErrors((e) => ({ ...e, [id]: true }))
       } finally {
@@ -89,7 +104,7 @@ export function useServers(api: ApiClient): ServersStatus {
         })
       }
     },
-    [api],
+    [api, fetchList],
   )
 
   const servers: ServerView[] = list.map((s) => ({

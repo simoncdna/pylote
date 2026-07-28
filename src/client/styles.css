@@ -376,8 +376,8 @@ body {
   gap: 10px;
   padding: 18px 12px 8px;
   border-radius: 18px;
-  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
-  background: color-mix(in srgb, var(--accent) 7%, transparent);
+  border: 1px solid color-mix(in srgb, var(--card-accent) 35%, transparent);
+  background: color-mix(in srgb, var(--card-accent) 7%, transparent);
 }
 
 .card-head {
