@@ -12,11 +12,6 @@ export interface ServerSummary {
   state: ServerState
 }
 
-/** Legacy single-server response — removed in the cleanup task. */
-export interface StatusResponse {
-  state: ServerState
-}
-
 export interface ActionResponse {
   ok: true
 }
