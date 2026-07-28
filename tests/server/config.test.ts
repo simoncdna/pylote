@@ -1,6 +1,5 @@
 import { test, expect } from 'bun:test'
-import { loadConfig } from '../../src/server/config.ts'
-import { parseConfig, loadConfigFile, ConfigError } from '../../src/server/config.ts'
+import { loadConfig, parseConfig, loadConfigFile, ConfigError } from '../../src/server/config.ts'
 
 const full = {
   PROXMOX_URL: 'https://pve.local:8006',

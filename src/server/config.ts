@@ -34,9 +34,9 @@ export class ConfigError extends Error {}
 
 type Env = Record<string, string | undefined>
 
-const PROXMOX_FIELDS = ['url', 'tokenId', 'tokenSecret', 'node', 'vmid'] as const
-const DOCKER_FIELDS = ['host', 'container'] as const
-const TYPES = ['proxmox-lxc', 'proxmox-vm', 'docker'] as const
+const PROXMOX_FIELDS = ['url', 'tokenId', 'tokenSecret', 'node', 'vmid'] as const satisfies readonly (keyof ProxmoxServerConfig)[]
+const DOCKER_FIELDS = ['host', 'container'] as const satisfies readonly (keyof DockerServerConfig)[]
+const TYPES = ['proxmox-lxc', 'proxmox-vm', 'docker'] as const satisfies readonly BackendType[]
 
 function interpolate(
   value: string,
@@ -66,7 +66,8 @@ export function parseConfig(yamlText: string, env: Env): AppConfig {
   const root = (raw ?? {}) as Record<string, unknown>
 
   const port = root.port === undefined ? 3000 : Number(root.port)
-  if (!Number.isInteger(port) || port <= 0) errors.push('port must be a positive integer')
+  if (!Number.isInteger(port) || port <= 0 || port > 65535)
+    errors.push('port must be an integer between 1 and 65535')
 
   const servers: ServerConfig[] = []
   const rawServers = root.servers
@@ -92,7 +93,7 @@ export function parseConfig(yamlText: string, env: Env): AppConfig {
       }
 
       const out: Record<string, unknown> = { id, name: s.name, type }
-      if (s.game !== undefined) out.game = String(s.game)
+      if (s.game != null) out.game = String(s.game)
       const fields = type === 'docker' ? DOCKER_FIELDS : PROXMOX_FIELDS
       for (const f of fields) {
         const v = s[f]
