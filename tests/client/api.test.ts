@@ -1,5 +1,6 @@
 import { test, expect } from 'bun:test'
 import { createApiClient } from '../../src/client/api.ts'
+import type { ServerSummary } from '../../src/shared/types.ts'
 
 function fakeFetch(status: number, body: unknown) {
   const calls: { url: string; init?: RequestInit }[] = []
@@ -11,7 +12,7 @@ function fakeFetch(status: number, body: unknown) {
 }
 
 test('listServers GETs /api/servers and returns the list', async () => {
-  const servers = [
+  const servers: ServerSummary[] = [
     { id: 'a', name: 'A', type: 'proxmox-lxc', state: 'running' },
   ]
   const { fn, calls } = fakeFetch(200, servers)
